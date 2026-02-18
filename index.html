@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stabilisation d'Apps Flutter | Expert Performance & Production</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00FF88;
+            --primary-dark: #00CC6A;
+            --secondary: #0A0E27;
+            --secondary-light: #1A1F3A;
+            --accent: #FF6B6B;
+            --text: #E8EAED;
+            --text-muted: #9CA3AF;
+            --bg: #0A0E27;
+            --card-bg: #12162E;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .mono {
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 2rem;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 107, 107, 0.03) 0%, transparent 50%);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px);
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            text-align: center;
+            z-index: 2;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.2s backwards;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease-out 0.4s backwards;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1s ease-out 0.6s backwards;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease-out 0.8s backwards;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-primary {
+            display: inline-block;
+            padding: 1.25rem 3rem;
+            background: var(--primary);
+            color: var(--secondary);
+            font-weight: 700;
+            font-size: 1.125rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out 1s backwards;
+        }
+
+        .cta-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-primary:hover::before {
+            left: 100%;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Pain Points Section */
+        .pain-section {
+            padding: 8rem 2rem;
+            background: var(--secondary-light);
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 4rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .pain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .pain-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pain-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: var(--accent);
+            transition: height 0.3s ease;
+        }
+
+        .pain-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .pain-card:hover::before {
+            height: 100%;
+        }
+
+        .pain-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pain-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .pain-description {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Offers Section */
+        .offers-section {
+            padding: 8rem 2rem;
+            background: var(--bg);
+        }
+
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .offer-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            padding: 3rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .offer-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .offer-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 255, 136, 0.2);
+        }
+
+        .offer-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .offer-card.featured {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(0, 255, 136, 0.05) 100%);
+        }
+
+        .offer-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: var(--secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .offer-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .offer-tagline {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .offer-price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .offer-price .small {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .offer-duration {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+        }
+
+        .offer-features {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .offer-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .offer-features li::before {
+            content: '✓';
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .cta-secondary {
+            display: block;
+            width: 100%;
+            padding: 1rem 2rem;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .cta-secondary:hover {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        /* Process Section */
+        .process-section {
+            padding: 8rem 2rem;
+            background: var(--secondary-light);
+        }
+
+        .process-timeline {
+            max-width: 900px;
+            margin: 4rem auto;
+            position: relative;
+        }
+
+        .process-timeline::before {
+            content: '';
+            position: absolute;
+            left: 2rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .process-step {
+            position: relative;
+            padding-left: 5rem;
+            margin-bottom: 4rem;
+        }
+
+        .process-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4rem;
+            height: 4rem;
+            background: var(--primary);
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .process-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .process-description {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Guarantee Section */
+        .guarantee-section {
+            padding: 8rem 2rem;
+            background: var(--bg);
+            text-align: center;
+        }
+
+        .guarantee-box {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 4rem;
+            background: var(--card-bg);
+            border: 3px solid var(--primary);
+            position: relative;
+        }
+
+        .guarantee-box::before,
+        .guarantee-box::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--primary);
+        }
+
+        .guarantee-box::before {
+            top: -3px;
+            left: -3px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .guarantee-box::after {
+            bottom: -3px;
+            right: -3px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .guarantee-icon {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+        }
+
+        .guarantee-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .guarantee-text {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 8rem 2rem;
+            background: var(--secondary-light);
+        }
+
+        .faq-container {
+            max-width: 900px;
+            margin: 4rem auto;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 2rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--primary);
+        }
+
+        .faq-toggle {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-answer {
+            padding: 0 2rem 2rem 2rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            display: none;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        /* Final CTA Section */
+        .final-cta {
+            padding: 8rem 2rem;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%);
+            text-align: center;
+        }
+
+        .final-cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .final-cta h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .final-cta p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            background: var(--secondary);
+            text-align: center;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-stats {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .process-timeline::before {
+                left: 1rem;
+            }
+
+            .process-step {
+                padding-left: 4rem;
+            }
+
+            .process-number {
+                width: 3rem;
+                height: 3rem;
+                font-size: 1.25rem;
+            }
+
+            .guarantee-box {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="tag mono">Expert Flutter Production</div>
+            <h1>Votre App Crash ?<br>On la Rend Incassable.</h1>
+            <p class="hero-subtitle">
+                Stabilisation, performance et monitoring en production pour apps Flutter instables.
+                <strong>Résultats mesurables en 2 semaines.</strong>
+            </p>
+
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number mono">-95%</span>
+                    <span class="stat-label">Crashs en Production</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number mono">3x</span>
+                    <span class="stat-label">Vitesse de Chargement</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number mono">24/7</span>
+                    <span class="stat-label">Monitoring Temps Réel</span>
+                </div>
+            </div>
+
+            <a href="https://calendly.com/dieudonnepixelnomad/30min" class="cta-primary">Démarrer avec un Diagnostic Gratuit →</a>
+        </div>
+    </section>
+
+    <!-- Pain Points -->
+    <section class="pain-section">
+        <div class="container">
+            <h2 class="section-title">Ces Problèmes Vous Coûtent Cher</h2>
+            <p class="section-subtitle">
+                Chaque crash = utilisateurs perdus. Chaque bug en prod = crédibilité endommagée.
+            </p>
+
+            <div class="pain-grid">
+                <div class="pain-card">
+                    <div class="pain-icon">🔥</div>
+                    <h3 class="pain-title">Crashs Récurrents en Prod</h3>
+                    <p class="pain-description">
+                        15% de taux de crash ? Vous perdez des utilisateurs avant même qu'ils n'utilisent votre app. 
+                        Les stores pénalisent, les reviews s'effondrent.
+                    </p>
+                </div>
+
+                <div class="pain-card">
+                    <div class="pain-icon">🐌</div>
+                    <h3 class="pain-title">Performance Dégueulasse</h3>
+                    <p class="pain-description">
+                        8 secondes de chargement ? Vos concurrents chargent en 1.5s. Vous perdez 70% de vos users 
+                        avant même qu'ils ne voient votre produit.
+                    </p>
+                </div>
+
+                <div class="pain-card">
+                    <div class="pain-icon">🕶️</div>
+                    <h3 class="pain-title">Zéro Visibilité en Prod</h3>
+                    <p class="pain-description">
+                        Vous découvrez les bugs via les reviews 1 étoile ? Sans monitoring, vous pilotez à l'aveugle. 
+                        Les incidents se multiplient en silence.
+                    </p>
+                </div>
+
+                <div class="pain-card">
+                    <div class="pain-icon">🏚️</div>
+                    <h3 class="pain-title">Dette Technique Explosive</h3>
+                    <p class="pain-description">
+                        Code spaghetti impossible à maintenir ? Chaque nouvelle feature casse 3 trucs ailleurs. 
+                        Votre vélocité est au plus bas.
+                    </p>
+                </div>
+
+                <div class="pain-card">
+                    <div class="pain-icon">⏰</div>
+                    <h3 class="pain-title">Urgences à Répétition</h3>
+                    <p class="pain-description">
+                        Week-ends ruinés par des hotfixes d'urgence. Votre équipe est épuisée. 
+                        Vous passez plus de temps à éteindre des feux qu'à construire.
+                    </p>
+                </div>
+
+                <div class="pain-card">
+                    <div class="pain-icon">💸</div>
+                    <h3 class="pain-title">Perte de Revenus</h3>
+                    <p class="pain-description">
+                        Chaque bug bloquant = utilisateurs qui partent vers la concurrence. 
+                        Impossible de scaler quand votre base technique est pourrie.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Offers Section -->
+    <section class="offers-section" id="offres">
+        <div class="container">
+            <h2 class="section-title">4 Formules. 1 Objectif : Stabilité Totale.</h2>
+            <p class="section-subtitle">
+                De l'audit gratuit à la refonte complète. Choisissez le niveau d'intervention dont vous avez besoin.
+            </p>
+
+            <div class="offers-grid">
+                <!-- Offer 1: Diagnostic -->
+                <div class="offer-card" id="audit-gratuit">
+                    <span class="offer-badge">Gratuit</span>
+                    <h3 class="offer-name">Diagnostic Stratégique</h3>
+                    <p class="offer-tagline">Comprendre votre contexte & évaluer l'urgence</p>
+                    
+                    <div class="offer-price">
+                        <span class="mono">0€</span>
+                    </div>
+                    <p class="offer-duration">Échange vidéo de 30 minutes</p>
+
+                    <ul class="offer-features">
+                        <li>Compréhension contexte business</li>
+                        <li>Évaluation criticité technique</li>
+                        <li>Identification niveau d'urgence</li>
+                        <li>Vérification adéquation</li>
+                        <li>Proposition d'audit si pertinent</li>
+                    </ul>
+
+                    <a href="https://calendly.com/dieudonnepixelnomad/30min" class="cta-secondary">Réserver Mon Diagnostic</a>
+                </div>
+
+                <!-- Offer 2: Audit -->
+                <div class="offer-card">
+                    <h3 class="offer-name">Audit Technique Approfondi</h3>
+                    <p class="offer-tagline">Vision claire pour éviter le superficiel</p>
+                    
+                    <div class="offer-price">
+                        <span class="small">À partir de</span><br>
+                        <span class="mono">1 500€</span>
+                    </div>
+                    <p class="offer-duration">Investissement stratégique</p>
+
+                    <ul class="offer-features">
+                        <li>Analyse architecture & dette technique</li>
+                        <li>Analyse crash reports & logs</li>
+                        <li>Profiling performance</li>
+                        <li>Identification risques critiques</li>
+                        <li>Roadmap priorisée</li>
+                        <li>Estimation impact business</li>
+                        <li>Livrable : Rapport structuré</li>
+                    </ul>
+
+                    <p style="margin-top: 2rem; color: var(--primary); font-size: 0.875rem;">
+                        <strong>✔ 100% déduit si Sprint signé</strong>
+                    </p>
+
+                    <a href="https://calendly.com/dieudonnepixelnomad/30min" class="cta-secondary">Commander mon Audit</a>
+                </div>
+
+                <!-- Offer 3: Sprint -->
+                <div class="offer-card featured">
+                    <span class="offer-badge">Intervention Intensive</span>
+                    <h3 class="offer-name">Sprint Stabilisation</h3>
+                    <p class="offer-tagline">Réduction du risque en production</p>
+                    
+                    <div class="offer-price">
+                        <span class="mono">6k€</span>
+                        <span class="small"> - 15k€</span>
+                    </div>
+                    <p class="offer-duration">2 à 4 semaines intensives</p>
+
+                    <ul class="offer-features">
+                        <li>Réduction significative des crashs</li>
+                        <li>Amélioration mesurable performances</li>
+                        <li>Mise en place monitoring</li>
+                        <li>Structuration observabilité</li>
+                        <li>Réduction risque technique</li>
+                        <li>Calibré selon complexité & urgence</li>
+                    </ul>
+
+                    <p style="margin-top: 2rem; color: var(--text-muted); font-size: 0.875rem;">
+                        <strong>Je facture la réduction du risque.</strong>
+                    </p>
+
+                    <a href="https://calendly.com/dieudonnepixelnomad/30min" class="cta-secondary">Démarrer le Sprint</a>
+                </div>
+
+                <!-- Offer 4: Monitoring -->
+                <div class="offer-card">
+                    <h3 class="offer-name">Monitoring & Protection</h3>
+                    <p class="offer-tagline">Éviter le retour au chaos</p>
+                    
+                    <div class="offer-price">
+                        <span class="small">À partir de</span><br>
+                        <span class="mono">1 200€</span>
+                        <span class="small">/mois</span>
+                    </div>
+                    <p class="offer-duration">Accompagnement mensuel</p>
+
+                    <ul class="offer-features">
+                        <li>Surveillance crash & alerting</li>
+                        <li>Analyse mensuelle des métriques</li>
+                        <li>Recommandations continues</li>
+                        <li>Mini-correctifs stratégiques</li>
+                        <li>Protection continue</li>
+                    </ul>
+
+                    <a href="https://calendly.com/dieudonnepixelnomad/30min" class="cta-secondary">Activer la Protection</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process-section">
+        <div class="container">
+            <h2 class="section-title">Comment On Travaille Ensemble</h2>
+            <p class="section-subtitle">
+                Une approche structurée en 3 étapes claires + un suivi continu. Pas de bricolage, que du résultat.
+            </p>
+
+            <div class="process-timeline">
+                <div class="process-step">
+                    <div class="process-number mono">1</div>
+                    <h3 class="process-title">Diagnostic Stratégique (30 min – Gratuit)</h3>
+                    <p class="process-description">
+                        On échange pour comprendre votre contexte business et évaluer la criticité technique.
+                        Si votre app correspond à mon périmètre, je vous propose un audit complet.
+                        L'objectif est de vérifier l'adéquation avant tout engagement.
+                    </p>
+                </div>
+
+                <div class="process-step">
+                    <div class="process-number mono">2</div>
+                    <h3 class="process-title">Audit Technique Approfondi</h3>
+                    <p class="process-description">
+                        Analyse complète de l'architecture, de la dette technique, des crash reports et de la performance.
+                        Je vous livre un rapport structuré avec une roadmap priorisée et une estimation d'impact business.
+                        Cet investissement permet d'éviter les interventions superficielles.
+                    </p>
+                </div>
+
+                <div class="process-step">
+                    <div class="process-number mono">3</div>
+                    <h3 class="process-title">Sprint Stabilisation & Performance</h3>
+                    <p class="process-description">
+                        Intervention intensive de 2 à 4 semaines calibrée selon la complexité et l'urgence.
+                        Objectifs : réduction significative des crashs, amélioration des performances et structuration de l'observabilité.
+                        Je ne facture pas des jours, je facture la réduction du risque en production.
+                    </p>
+                </div>
+
+                <div class="process-step">
+                    <div class="process-number mono">4</div>
+                    <h3 class="process-title">Monitoring & Protection Continue</h3>
+                    <p class="process-description">
+                        Une application stabilisée doit rester stable. Je propose un accompagnement mensuel pour éviter le retour au chaos :
+                        surveillance des crashs, analyse des métriques et mini-correctifs stratégiques.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guarantee Section -->
+    <section class="guarantee-section">
+        <div class="container">
+            <h2 class="section-title">Garantie Résultats ou Remboursé</h2>
+
+            <div class="guarantee-box">
+                <div class="guarantee-icon">🛡️</div>
+                <h3 class="guarantee-title">Engagement -80% de Crashs Minimum</h3>
+                <p class="guarantee-text">
+                    Si à la fin du sprint, votre taux de crash n'a pas baissé d'au moins 80%, 
+                    je continue à travailler <strong>gratuitement</strong> jusqu'à atteindre l'objectif.<br><br>
+                    Pas de résultat = pas de paiement final. C'est aussi simple que ça.<br><br>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <h2 class="section-title">Questions Fréquentes</h2>
+
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Pourquoi le diagnostic est gratuit ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Parce que je veux vérifier que je peux vraiment vous aider avant tout engagement financier. 
+                        30 minutes suffisent pour comprendre votre contexte et évaluer l'urgence. 
+                        Si votre app n'est pas dans mon périmètre, je vous le dis immédiatement.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Combien de temps pour voir des résultats ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        L'audit est livré sous 3 à 5 jours. 
+                        Durant le Sprint, les premiers correctifs critiques sont déployés dès la première semaine. 
+                        Le monitoring complet est opérationnel en 2 semaines.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Vous travaillez à distance ou sur site ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        100% remote. Je suis basé au Cameroun mais je travaille avec des clients partout (Europe, Afrique, Amérique). 
+                        Communication quotidienne via Slack, calls hebdomadaires sur Zoom/Meet. Le décalage horaire n'est jamais un problème.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Quelle est la différence entre Audit et Sprint ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <strong>L'Audit Technique</strong> est un état des lieux complet et une roadmap. Il vous donne la vision et la stratégie. C'est un pré-requis pour éviter de naviguer à vue.<br><br>
+                        <strong>Le Sprint Stabilisation</strong> est l'intervention technique pure où je corrige les problèmes identifiés. L'audit est 100% remboursé si vous signez pour le Sprint.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Vous formez notre équipe ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Oui, c'est inclus dans le Sprint. Formation sur les bonnes pratiques Flutter, sessions de pair programming 
+                        avec votre équipe, documentation détaillée. L'objectif est que vous soyez 100% autonomes après mon intervention.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Quels outils de monitoring utilisez-vous ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Stack complète : Firebase Crashlytics (crashs en temps réel), Sentry (error tracking avancé).  
+                        Je m'adapte à vos outils existants si vous en avez déjà.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Vous signez des NDA ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Absolument. Je signe systématiquement un NDA avant tout audit. Confidentialité totale garantie. 
+                        Je travaille régulièrement avec des fintechs, healthtech et autres secteurs sensibles.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Modalités de paiement ?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <strong>Audit :</strong> Paiement à la commande.<br>
+                        <strong>Sprint :</strong> 50% à la signature, 50% à la livraison (si objectifs atteints).<br>
+                        <strong>Monitoring :</strong> Paiement mensuel par virement ou Stripe.<br><br>
+                        Facture avec TVA si applicable. Paiement par virement SEPA, Wise, ou carte bancaire.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta" id="contact">
+        <div class="final-cta-content">
+            <h2>Prêt à Rendre Votre App Incassable ?</h2>
+            <p>
+                On commence par un diagnostic gratuit de 30 minutes. Zéro engagement. 
+                Je vous montre exactement ce qui cloche et comment on peut le réparer.
+            </p>
+            <a href="https://calendly.com/dieudonnepixelnomad/30min" class="cta-primary" style="display: inline-block;">
+                Réserver Mon Diagnostic Gratuit →
+            </a>
+            <p style="margin-top: 2rem; font-size: 0.875rem;">
+                Ou envoyez-moi un message sur 
+                <a href="https://www.linkedin.com/in/dieudonne-gwet-bikoun-847914203/" target="_blank" style="color: var(--primary); text-decoration: none;"><strong>LinkedIn</strong></a> 
+                ou par <strong>email</strong> : <a href="mailto:dieudonnegwet86@gmail.com" style="color: var(--primary); text-decoration: none;">dieudonnegwet86@gmail.com</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p class="mono">
+            © 2026 - Expert Flutter Stabilisation | Douala, Cameroun 🇨🇲
+        </p>
+        <p style="margin-top: 1rem; font-size: 0.875rem;">
+            <a href="https://www.linkedin.com/in/dieudonne-gwet-bikoun-847914203/" target="_blank" style="color: var(--text-muted); text-decoration: none; margin: 0 0.5rem;">LinkedIn</a> • 
+            <a href="mailto:dieudonnegwet86@gmail.com" style="color: var(--text-muted); text-decoration: none; margin: 0 0.5rem;">Email</a>
+        </p>
+    </footer>
+
+    <script>
+        // FAQ Toggle
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const wasActive = item.classList.contains('active');
+                
+                // Close all items
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                
+                // Open clicked item if it wasn't active
+                if (!wasActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
