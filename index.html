@@ -598,6 +598,114 @@
             border-top: 1px solid var(--border);
         }
 
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 8rem 2rem;
+            background: var(--bg);
+            position: relative;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .testimonial-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 3rem;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .quote-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            opacity: 0.3;
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            font-family: serif;
+        }
+
+        .testimonial-text {
+            font-size: 1.125rem;
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            font-style: italic;
+        }
+
+        .testimonial-results {
+            display: flex;
+            gap: 2rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 5.5rem;
+            height: 5.5rem;
+            background: var(--secondary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            overflow: hidden; /* Ensure image stays within circle */
+        }
+
+        .author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* or contain depending on logo aspect ratio */
+        }
+
+        .author-info h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .author-info span {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero-stats {
@@ -880,6 +988,79 @@
                         Une application stabilisée doit rester stable. Je propose un accompagnement mensuel pour éviter le retour au chaos :
                         surveillance des crashs, analyse des métriques et mini-correctifs stratégiques.
                     </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section">
+        <div class="container">
+            <h2 class="section-title">Ils sont passés du Chaos à la Stabilité</h2>
+            <p class="section-subtitle">
+                Résultats concrets sur des applications en production.
+            </p>
+
+            <div class="testimonials-grid">
+                <!-- Testimonial 1: Klaro -->
+                <div class="testimonial-card">
+                    <div class="quote-icon">❝</div>
+                    <p class="testimonial-text">
+                        "Notre ERP Mobile de gestion pour quincaillerie était un enfer : dès que le réseau flanchait en boutique, tout s'arrêtait. Impossible d'encaisser ou de vérifier les stocks.
+                        Dieudonné a transformé l'app en véritable outil <strong>Offline-First</strong>.
+                        Aujourd'hui, nos vendeurs travaillent en continu, avec ou sans connexion. Le business ne s'arrête plus."
+                    </p>
+                    
+                    <div class="testimonial-results">
+                        <div class="result-item">
+                            <span class="result-value">-95%</span>
+                            <span class="result-label">de crashs</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-value">100%</span>
+                            <span class="result-label">Fonctionnel Offline</span>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="images/logo_klaro_black.png" alt="Klaro Logo">
+                        </div>
+                        <div class="author-info">
+                            <h4>Gérant, Klaro</h4>
+                            <span>Quincaillerie / Retail</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2: AlertContacts -->
+                <div class="testimonial-card">
+                    <div class="quote-icon">❝</div>
+                    <p class="testimonial-text">
+                        "Sur une app de sécurité, une fausse alerte est pire qu'un bug. On avait des problèmes de batterie et de géofencing imprécis.
+                        L'audit a révélé des soucis que nos logs ne montraient même pas. On a arrêté de se battre avec le framework pour enfin dormir tranquille."
+                    </p>
+                    
+                    <div class="testimonial-results">
+                        <div class="result-item">
+                            <span class="result-value">0</span>
+                            <span class="result-label">Faux Positifs Critiques</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-value">+4h</span>
+                            <span class="result-label">Autonomie Batterie</span>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="images/logo_alertcontacts.png" alt="AlertContacts Logo">
+                        </div>
+                        <div class="author-info">
+                            <h4>CEO, AlertContacts</h4>
+                            <span>Safety App</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
